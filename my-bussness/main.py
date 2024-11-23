@@ -1,11 +1,13 @@
 import asyncio
 import json
+import csv
 from aiohttp import ClientSession
 from parsel import Selector
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from pathlib import Path
 
 USE_KAFKA = False
-
+SAVE_TO_CSV = True
 BASE_URL = "https://мойбизнес.рф"
 PAGE_URL = f"{BASE_URL}/anticrisis"
 
@@ -21,6 +23,7 @@ async def fetch_html(session, url):
 async def parse_support_measures():
     """Функция для извлечения данных о мерах поддержки."""
     result = []
+    csv_file_path = Path("parsed_support_measures.csv")
 
     async with ClientSession() as session:
         html = await fetch_html(session, PAGE_URL)
@@ -44,6 +47,17 @@ async def parse_support_measures():
                     "url": f"{BASE_URL}{link.strip()}",
                     "description": description.strip()
                 })
+
+    # Сохранение данных в CSV, если включено
+    if SAVE_TO_CSV:
+        try:
+            with csv_file_path.open("w", newline='', encoding="utf-8") as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=["title", "url", "description"])
+                writer.writeheader()
+                writer.writerows(result)
+            print(f"Данные сохранены в файл: {csv_file_path}")
+        except Exception as e:
+            print(f"Ошибка сохранения CSV: {e}")
 
     return result
 
