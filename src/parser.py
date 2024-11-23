@@ -3,15 +3,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 import hues
+import json
 import chromedriver_autoinstaller
 hues.log("Auto-install")
 chromedriver_autoinstaller.install() 
 driver = webdriver.Chrome()
 hues.log("")
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-import time
-import json
+
 
 def find_inn(inn):
     """
@@ -23,10 +21,8 @@ def find_inn(inn):
     Returns:
         str: A JSON string containing the search results.
     """
-    results = []  # List to store extracted results
-
+    results = []  
     try:
-        # Open the website and wait for it to load
         driver.get("https://egrul.nalog.ru/index.html")
         time.sleep(3)
         
